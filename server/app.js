@@ -46,16 +46,20 @@ var displayTime = function( msg ) {
   var minutes = Math.floor((lengthTime % (1000 * 60 * 60)) / (1000 * 60));
   var seconds = Math.floor((lengthTime % (1000 * 60)) / 1000);
 
-  lcd.clear();
-  lcd.cursor(0,0).print( msg );
-  if( lengthTime > 0) {
+
+  if( lengthTime >= 0) {
+    lcd.clear();
+    lcd.cursor(0,0).print( msg );
     lcd.cursor(1,0).print(hours + "h "
       + minutes + "m " + seconds + "s ");
   } else {
-    lcd.cursor(1,0).print('Time Expired');
     if( !alert ) {
+      lcd.clear();
+      lcd.cursor(0,0).print( msg );
+      lcd.cursor(1,0).print('Time Expired');
       piezo.play( songs.load('mario-intro') );
-      alert = true;
+      resetTimer();
+      startTimer = false;
     }
   }
 };
@@ -77,6 +81,8 @@ board.on("ready", function() {
     startTimer = false;
     timer = 0;
     alert = false;
+    displayTime('Add Time');
+    lcd.cursor(1,0).print('                ');
   });
   addTimeButton = new five.Button({
     pin: 3,
